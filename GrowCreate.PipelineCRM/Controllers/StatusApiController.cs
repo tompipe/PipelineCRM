@@ -21,6 +21,12 @@ namespace GrowCreate.PipelineCRM.Controllers
             return DbService.db().Query<Status>("select * from pipelineStatus");
         }
 
+        public Status GetByName(string statusName)
+        {
+            var query = new Sql().Select("*").From("pipelineStatus").Where<Status>(x => x.Name == statusName);
+            return DbService.db().Fetch<Status>(query).FirstOrDefault();
+        }
+
         public Status GetById(int id)
         {
             var query = new Sql().Select("*").From("pipelineStatus").Where<Status>(x => x.Id == id);
