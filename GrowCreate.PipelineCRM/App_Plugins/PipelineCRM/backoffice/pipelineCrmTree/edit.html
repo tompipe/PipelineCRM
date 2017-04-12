@@ -72,12 +72,12 @@
                         <a prevent-default class="btn" ng-click="addContact()"><i class="icon-add blue"></i> <localize key="add"></localize></a>
                     </umb-control-group>
 
-                    <umb-control-group label="@pipeline_organisation" description="@pipeline_organisationHelp">
+                    <!--<umb-control-group label="@pipeline_organisation" description="@pipeline_organisationHelp">
                         <select ng-model="pipeline.OrganisationId"
                                 ng-options="org.Id as org.Name for org in Organisations"></select>
                         <a class="btn btn-link" ng-if="pipeline.OrganisationId" href="#/pipelineCrm/pipelineCrmTree/edit.organisation/{{ pipeline.OrganisationId }}"><localize key="view"></localize> <i class="icon icon-navigation-right blue"></i></a>
                         <a prevent-default class="btn" ng-click="addOrganisation()"><i class="icon-add blue"></i> <localize key="add"></localize></a>
-                    </umb-control-group>
+                    </umb-control-group>-->
 
                     <umb-control-group label="@pipeline_createdDate" description="@pipeline_createdDateHelp">
                         <umb-editor model="createdDatepicker"></umb-editor>

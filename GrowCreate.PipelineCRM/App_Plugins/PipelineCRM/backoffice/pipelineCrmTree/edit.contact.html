@@ -52,7 +52,7 @@
                     <umb-control-group label="@pipeline_title" description="@pipeline_typeHelp">
                         <input type="text" class="umb-editor umb-textstring" ng-model="contact.Title" />
                     </umb-control-group>
-                    <umb-control-group label="@pipeline_organisations" description="@pipeline_organisationsHelp">
+                    <!--<umb-control-group label="@pipeline_organisations" description="@pipeline_organisationsHelp">
                         <ul class="unstyled list-icons" ng-if="contact.Organisations.length > 0">
                             <li ng-repeat="org in contact.Organisations">
                                 <i class="icon icon-delete red hover-show pull-right" ng-click="removeOrganisation(org)"></i>
@@ -64,7 +64,7 @@
                             <a href ng-click="addOrganisation()" prevent-default><i class="icon icon-add blue"></i> <localize key="add"></localize></a>
                             <a href ng-click="selectOrganisation()" prevent-default><i class="icon icon-add blue"></i> <localize key="buttons_select"></localize></a>
                         </p>
-                    </umb-control-group>
+                    </umb-control-group>-->
                     <umb-control-group label="@pipeline_email" description="@pipeline_emailHelp">
                         <input type="text" class="umb-editor umb-textstring" ng-model="contact.Email" required />
                     </umb-control-group>

@@ -106,17 +106,17 @@ namespace GrowCreate.PipelineCRM.Trees
                     )
                 );
 
-                nodes.Add(
-                    CreateTreeNode(
-                        "organisations",
-                        "-1",
-                        queryStrings,
-                        GetTranslation("pipeline/organisations"),
-                        "icon-company",
-                        true,
-                        mainRoute + "/organisations/0"
-                    )
-                );
+                //nodes.Add(
+                //    CreateTreeNode(
+                //        "organisations",
+                //        "-1",
+                //        queryStrings,
+                //        GetTranslation("pipeline/organisations"),
+                //        "icon-company",
+                //        true,
+                //        mainRoute + "/organisations/0"
+                //    )
+                //);
 
                 nodes.Add(
                     CreateTreeNode(
