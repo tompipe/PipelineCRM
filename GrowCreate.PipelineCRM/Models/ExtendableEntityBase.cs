@@ -5,7 +5,6 @@ using System.Web.Http.Validation;
 using GrowCreate.PipelineCRM.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Our.Umbraco.NestedContent.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;

@@ -6,7 +6,6 @@ using GrowCreate.PipelineCRM.Models;
 using GrowCreate.PipelineCRM.Models.DetachedPublishedContent;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Our.Umbraco.NestedContent.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;

@@ -19,7 +19,6 @@ using System.Configuration;
 using GrowCreate.PipelineCRM.Config;
 using GrowCreate.PipelineCRM.Services.DataServices;
 using Newtonsoft.Json;
-using Our.Umbraco.NestedContent.Models;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace GrowCreate.PipelineCRM.Controllers
