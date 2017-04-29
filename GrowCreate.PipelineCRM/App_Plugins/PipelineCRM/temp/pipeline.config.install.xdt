@@ -5,10 +5,6 @@
     createMembers = "true"
     memberType = "Member"
     pageSize = "50"
-    opportunityDocTypes = "pipelineMain"
-    contactDocTypes = "pipelineContact"
-    groupDocTypes = "pipelineGroup"
-    segmentDocTypes = "pipelineSegment"
     digestTime = "7"
     digestSubject = "{0}'s digest for {1}"
     digestSender = "no-reply@website.com"    
@@ -17,6 +13,12 @@
     userTrackingCookie = "PipelineContactId"
     userTrackingCookieExpiry = "30"
     >
+    <ContentTypeMappings>
+      <map Type="GrowCreate.PipelineCRM.Models.Contact" Alias="pipelineContact" />
+      <map Type="GrowCreate.PipelineCRM.Models.Pipeline" Alias="pipelineMain" />
+      <map Type="GrowCreate.PipelineCRM.Models.Organisation" Alias="pipelineOrganisation" />
+      <map Type="GrowCreate.PipelineCRM.Models.Segment" Alias="pipelineSegment" />
+    </ContentTypeMappings>
   </appSettings>
   <digestBody>
     <![CDATA[
