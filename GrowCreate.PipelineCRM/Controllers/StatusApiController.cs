@@ -10,6 +10,7 @@ using Umbraco.Web.Mvc;
 using GrowCreate.PipelineCRM.Models;
 using Umbraco.Web.WebApi;
 using GrowCreate.PipelineCRM.Services;
+using GrowCreate.PipelineCRM.Services.DataServices;
 
 namespace GrowCreate.PipelineCRM.Controllers
 {

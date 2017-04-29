@@ -13,6 +13,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using GrowCreate.PipelineCRM.Config;
+using GrowCreate.PipelineCRM.Extensions;
+using GrowCreate.PipelineCRM.Services.DataServices;
 
 namespace GrowCreate.PipelineCRM.Services
 {
@@ -78,7 +80,7 @@ namespace GrowCreate.PipelineCRM.Services
                 query.OrderBy("StatusId, Name, DateUpdated asc");
             }
 
-            var p = DbService.db().Page<Pipeline>(pageNumber, itemsPerPage, query);
+            var p = PipelineDbService.Instance.Page(pageNumber, itemsPerPage, query);
 
             for (int i = 0; i < p.Items.ToList().Count(); i++)
             {

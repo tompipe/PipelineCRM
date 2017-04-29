@@ -13,8 +13,9 @@ using Umbraco.Core.Services;
 using Umbraco.Core;
 using GrowCreate.PipelineCRM.Services;
 using Newtonsoft.Json.Linq;
-using GrowCreate.PipelineCRM.DataServices;
 using GrowCreate.PipelineCRM.Config;
+using GrowCreate.PipelineCRM.Extensions;
+using GrowCreate.PipelineCRM.Services.DataServices;
 
 namespace GrowCreate.PipelineCRM.Controllers
 {
@@ -48,7 +49,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Pipeline> GetAll(bool getLinks = false)
         {
             var query = new Sql().Select("*").From("pipelinePipeline").Where<Pipeline>(x => !x.Archived);
-            var pipelines = DbService.db().Fetch<Pipeline>(query).ToList();
+            var pipelines = PipelineDbService.Instance.Fetch(query).ToList();
 
             if (getLinks)
             {
@@ -75,7 +76,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Pipeline> GetByStatusId(int id, bool getLinks = false)
         {
             var query = new Sql().Select("*").From("pipelinePipeline").Where<Pipeline>(x => x.StatusId == id).Where<Pipeline>(x => !x.Archived);
-            var pipelines = DbService.db().Fetch<Pipeline>(query).ToList();
+            var pipelines = PipelineDbService.Instance.Fetch(query).ToList();
 
             if (getLinks)
             {
@@ -90,7 +91,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Pipeline> GetByOrganisationId(int id, bool getLinks = false)
         {
             var query = new Sql().Select("*").From("pipelinePipeline").Where<Pipeline>(x => x.OrganisationId == id).Where<Pipeline>(x => !x.Archived);
-            var pipelines = DbService.db().Fetch<Pipeline>(query).ToList();
+            var pipelines = PipelineDbService.Instance.Fetch(query).ToList();
 
             if (getLinks)
             {
@@ -105,7 +106,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Pipeline> GetByUserEmail(string email)
         {
             var query = new Sql("select p.* from pipelinePipeline p, pipelineContact c where p.ContactId = c.Id and c.Email = @0 and (p.Archived is null or p.Archived = 0) and p.ShareWithContact = 1", email);
-            var pipelines = DbService.db().Fetch<Pipeline>(query).ToList();
+            var pipelines = PipelineDbService.Instance.Fetch(query).ToList();
 
             for (int i = 0; i < pipelines.Count(); i++)
             {
@@ -117,7 +118,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Pipeline> GetByContactId(int id)
         {
             var query = new Sql().Select("*").From("pipelinePipeline").Where<Pipeline>(x => x.ContactId == id).Where<Pipeline>(x => !x.Archived);
-            var pipelines = DbService.db().Fetch<Pipeline>(query).ToList();
+            var pipelines = PipelineDbService.Instance.Fetch(query).ToList();
 
             for (int i = 0; i < pipelines.Count(); i++)
             {
@@ -154,7 +155,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public Pipeline GetById(int id, bool getLinks = true)
         {
             var query = new Sql().Select("*").From("pipelinePipeline").Where<Pipeline>(x => x.Id == id);
-            var pipeline = DbService.db().Fetch<Pipeline>(query).FirstOrDefault();            
+            var pipeline = PipelineDbService.Instance.Fetch(query).FirstOrDefault();            
 
             if (pipeline != null && getLinks && !pipeline.Obscured)
             {
@@ -173,7 +174,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public Pipeline Duplicate(Pipeline source)
         {
             var query = new Sql().Select("*").From("pipelinePipeline").Where<Pipeline>(x => x.Id == source.Id);
-            var pipeline = DbService.db().Fetch<Pipeline>(query).FirstOrDefault();
+            var pipeline = PipelineDbService.Instance.Fetch(query).FirstOrDefault();
             
             pipeline.Id = 0;
             pipeline.Name = pipeline.Name + " (copy)";
@@ -183,7 +184,7 @@ namespace GrowCreate.PipelineCRM.Controllers
 
         public Pipeline PostSave(Pipeline pipeline)
         {
-            return PipelineDbService.Instance.SavePipeline(pipeline);
+            return pipeline.Save();
         }
 
         public int PostSavePipelines(IEnumerable<Pipeline> pipelines)
@@ -209,7 +210,7 @@ namespace GrowCreate.PipelineCRM.Controllers
                 }
 
                 new TaskApiController().DeleteTasks(pipeline.Tasks);
-                return DbService.db().Delete<Pipeline>(id);
+                return PipelineDbService.Instance.Delete(id);
             }
             return 0;
         }
@@ -234,163 +235,23 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Pipeline> GetArchived()
         {
             var query = new Sql().Select("*").From("pipelinePipeline").Where<Pipeline>(x => x.Archived);
-            var pipelines = DbService.db().Fetch<Pipeline>(query);
+            var pipelines = PipelineDbService.Instance.Fetch(query);
             return pipelines;
         }
 
         public void Archive(Pipeline pipeline)
         {
             pipeline.Archived = true;
-            DbService.db().Save(pipeline);
+            pipeline.Save();
         }
 
         public void Restore(Pipeline pipeline)
         {
             pipeline.Archived = false;
-            DbService.db().Save(pipeline);
+            pipeline.Save();
         }
 
     }
 
     // pipeline extensions
-
-    public static class PipelineExtensions
-    {
-        public static IEnumerable<dynamic> GetProperties(this Pipeline pipeline)
-        {
-            if (!String.IsNullOrEmpty(pipeline.CustomProps))
-                return Newtonsoft.Json.Linq.JArray.Parse(pipeline.CustomProps) as IEnumerable<dynamic>;
-            else
-                return new List<dynamic>();
-        }
-
-        public static dynamic GetProperty(this Pipeline pipeline, string alias)
-        {
-            var props = pipeline.GetProperties();
-            return props.Where(x => x.alias.ToString().ToLower() == alias.ToLower()).FirstOrDefault();
-        }
-
-        public static dynamic GetPropertyValue(this Pipeline pipeline, string alias)
-        {
-            var prop = pipeline.GetProperty(alias);
-            if (prop != null && prop.value != null)
-            {
-                //todo: how about strongly-typed results?
-                return prop.value;
-            }
-            return null;
-        }
-
-        public static Pipeline UpdateProperties(this Pipeline pipeline, Dictionary<string, dynamic> updates)
-        {
-            var props = pipeline.GetProperties().ToList();
-            foreach (var update in updates)
-            {
-                var prop = props.Where(x => x.alias.ToString().ToLower() == update.Key.ToLower()).FirstOrDefault();
-
-                if (prop == null)
-                {
-                    // get doc type from pipeline config
-                    string alias = update.Key;
-                    var pipelineConfig = PipelineConfig.GetConfig().AppSettings;
-                    var docType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(pipelineConfig.OpportunityDocTypes);
-
-                    if (docType != null)
-                    {
-                        var type = docType.PropertyTypes.SingleOrDefault(x => x.Alias.ToLower() == alias.ToLower());
-                        if (type != null)
-                        {
-                            var newProp = new
-                            {
-                                alias = alias,
-                                value = update.Value,
-                                id = type.Id
-                            };
-                            props.Add(newProp);
-                        }
-                    }
-                }
-                else
-                {
-                    prop.value = update.Value;
-                }
-            }
-            pipeline.CustomProps = Newtonsoft.Json.JsonConvert.SerializeObject(props);
-            return pipeline;
-        }
-
-        public static Pipeline UpdateArrayProperties(this Pipeline pipeline, Dictionary<string, string[]> updates)
-        {
-            var props = pipeline.GetProperties().ToList();
-            foreach (var update in updates)
-            {
-                var prop = props.Where(x => x.alias.ToString().ToLower() == update.Key.ToLower()).FirstOrDefault();
-                JArray jValue = JArray.FromObject(update.Value);
-
-                if (prop == null)
-                {
-                    // get doc type from pipeline config
-                    string alias = update.Key;
-                    var pipelineConfig = PipelineConfig.GetConfig().AppSettings;
-                    var docType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(pipelineConfig.OpportunityDocTypes);
-
-                    if (docType != null)
-                    {
-                        var type = docType.PropertyTypes.SingleOrDefault(x => x.Alias.ToLower() == alias.ToLower());
-                        if (type != null)
-                        {
-                            var newProp = new
-                            {
-                                alias = alias,
-                                value = jValue,
-                                id = type.Id
-                            };
-                            props.Add(newProp);
-                        }
-                    }
-                }
-                else
-                {
-                    prop.value = jValue;
-                }
-            }
-            pipeline.CustomProps = Newtonsoft.Json.JsonConvert.SerializeObject(props);
-            return pipeline;
-        }
-
-        public static Pipeline UpdateProperty(this Pipeline pipeline, string alias, dynamic value)
-        {
-            var props = pipeline.GetProperties().ToList();
-            var prop = props.Where(x => x.alias.ToString().ToLower() == alias.ToLower()).FirstOrDefault();
-
-            if (prop == null)
-            {
-                var pipelineConfig = PipelineConfig.GetConfig().AppSettings;
-                var docType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(pipelineConfig.OpportunityDocTypes);
-                var typeId = docType.PropertyTypes.FirstOrDefault(x => x.Alias.ToLower() == alias.ToLower()).Id;
-
-                var newProp = new
-                {
-                    alias = alias,
-                    value = value,
-                    id = typeId
-                };
-                props.Add(newProp);
-            }
-            else
-            {
-                props.Where(x => x.alias.ToString().ToLower() == alias.ToLower()).FirstOrDefault().value = value;
-            }
-
-            pipeline.CustomProps = Newtonsoft.Json.JsonConvert.SerializeObject(props);
-            return pipeline;
-        }
-
-        public static Pipeline Save(this Pipeline pipeline)
-        {
-            return new PipelineApiController().PostSave(pipeline);
-        }
-
-    }
-
 }

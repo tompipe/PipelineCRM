@@ -9,7 +9,7 @@ using Umbraco.Web.Mvc;
 using GrowCreate.PipelineCRM.Models;
 using Umbraco.Web.WebApi;
 using GrowCreate.PipelineCRM.Services;
-using GrowCreate.PipelineCRM.DataServices;
+using GrowCreate.PipelineCRM.Services.DataServices;
 
 namespace GrowCreate.PipelineCRM.Controllers
 {
@@ -48,7 +48,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Organisation> GetAll(bool getLinks = false)
         {
             var query = new Sql().Select("*").From("pipelineOrganisation").Where<Organisation>(x => !x.Archived);
-            var orgs = DbService.db().Fetch<Organisation>(query);
+            var orgs = OrganisationDbService.Instance.Fetch(query);
             if (getLinks)
             {
                 for (int i = 0; i < orgs.Count(); i++)
@@ -67,7 +67,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Organisation> GetUnassigned(bool getLinks = false)
         {
             var query = new Sql().Select("*").From("pipelineOrganisation").Where<Organisation>(x => !x.Archived && x.TypeId == 0);
-            var orgs = DbService.db().Fetch<Organisation>(query);
+            var orgs = OrganisationDbService.Instance.Fetch(query);
             if (getLinks)
             {
                 for (int i = 0; i < orgs.Count(); i++)
@@ -90,7 +90,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public Organisation GetById(int id, bool getLinks = true)
         {
             var query = new Sql().Select("*").From("pipelineOrganisation").Where<Organisation>(x => x.Id == id);
-            var org = DbService.db().Fetch<Organisation>(query).FirstOrDefault();            
+            var org = OrganisationDbService.Instance.Fetch(query).FirstOrDefault();            
             
             if (getLinks && org!= null && !org.Obscured)
             {
@@ -108,13 +108,13 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Organisation> GetByMemberId(int id)
         {
             var query = new Sql().Select("*").From("pipelineOrganisation").Where<Organisation>(x => x.MemberIds.Contains(id.ToString()));
-            return DbService.db().Fetch<Organisation>(query);
+            return OrganisationDbService.Instance.Fetch(query);
         }
 
         public IEnumerable<Organisation> GetByTypeId(int id, bool getLinks = false)
         {
             var query = new Sql().Select("*").From("pipelineOrganisation").Where<Organisation>(x => x.TypeId == id).Where<Organisation>(x => !x.Archived);
-            var orgs = DbService.db().Fetch<Organisation>(query);
+            var orgs = OrganisationDbService.Instance.Fetch(query);
             if (getLinks)
             {
                 for (int i = 0; i < orgs.Count(); i++)
@@ -128,19 +128,19 @@ namespace GrowCreate.PipelineCRM.Controllers
         public Organisation GetByName(string name)
         {
             var query = new Sql().Select("*").From("pipelineOrganisation").Where<Organisation>(x => x.Name.ToLower() == name.ToLower());
-            var org = DbService.db().Fetch<Organisation>(query).FirstOrDefault();
+            var org = OrganisationDbService.Instance.Fetch(query).FirstOrDefault();
             return org;
         }
 
         public IEnumerable<Organisation> GetOrganisationsByName(string name)
         {
             var query = new Sql().Select("*").From("pipelineOrganisation").Where<Organisation>(x => x.Name.ToLower().Contains(name.ToLower()));
-            return DbService.db().Fetch<Organisation>(query);
+            return OrganisationDbService.Instance.Fetch(query);
         }
 
         public Organisation PostSave(Organisation org)
         {
-            org = OrganisationDbService.Instance.SaveOrganisation(org);
+            org = OrganisationDbService.Instance.Save(org);
             org.Contacts = new ContactApiController().GetByOrganisationId(org.Id);
             return org;
         }
@@ -172,7 +172,7 @@ namespace GrowCreate.PipelineCRM.Controllers
                 }
 
                 new TaskApiController().DeleteTasks(org.Tasks);
-                return DbService.db().Delete<Organisation>(id);
+                return OrganisationDbService.Instance.Delete(id);
             }
             return 0;
         }
@@ -211,20 +211,20 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Organisation> GetArchived()
         {
             var query = new Sql().Select("*").From("pipelineOrganisation").Where<Organisation>(x => x.Archived);
-            var orgs = DbService.db().Fetch<Organisation>(query);
+            var orgs = OrganisationDbService.Instance.Fetch(query);
             return orgs;
         }
 
         public void Archive(Organisation org)
         {
             org.Archived = true;
-            DbService.db().Save(org);
+            OrganisationDbService.Instance.Save(org);
         }
 
         public void Restore(Organisation org)
         {
             org.Archived = false;
-            DbService.db().Save(org);
+            OrganisationDbService.Instance.Save(org);
         }
 
     }

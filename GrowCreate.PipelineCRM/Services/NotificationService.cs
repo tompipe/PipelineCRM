@@ -12,6 +12,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using System.Configuration;
+using GrowCreate.PipelineCRM.Services.DataServices;
 
 namespace GrowCreate.PipelineCRM.Services
 {

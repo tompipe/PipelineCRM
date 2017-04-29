@@ -1,9 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
 using GrowCreate.PipelineCRM.Config;
+﻿using GrowCreate.PipelineCRM.Config;
 using GrowCreate.PipelineCRM.Controllers;
-using GrowCreate.PipelineCRM.DataServices;
 using GrowCreate.PipelineCRM.Models;
 using GrowCreate.PipelineCRM.Services;
+using GrowCreate.PipelineCRM.Services.DataServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace GrowCreate.PipelineCRM.Services
         public Contact GetById(int Id, bool getLinks = true)
         {
             var query = new Sql().Select("*").From("pipelineContact").Where<Contact>(x => x.Id == Id);
-            var contact = DbService.db().Fetch<Contact>(query).FirstOrDefault();            
+            var contact = ContactDbService.Instance.Fetch(query).FirstOrDefault();            
 
             if (getLinks && contact != null && !contact.Obscured)
             {
@@ -34,7 +35,7 @@ namespace GrowCreate.PipelineCRM.Services
             {
                 int[] idList = Ids.Split(',').Select(int.Parse).ToArray();
                 var query = new Sql("select * from pipelineContact where Id in (@idList)", new { idList });
-                return DbService.db().Fetch<Contact>(query);
+                return ContactDbService.Instance.Fetch(query);
             }
             return new List<Contact>();
         }
@@ -42,7 +43,7 @@ namespace GrowCreate.PipelineCRM.Services
         public Contact GetByEmail(string Email, bool getLinks = true)
         {
             var query = new Sql().Select("*").From("pipelineContact").Where<Contact>(x => x.Email == Email);
-            var contact = DbService.db().Fetch<Contact>(query).FirstOrDefault();            
+            var contact = ContactDbService.Instance.Fetch(query).FirstOrDefault();            
 
             if (getLinks && contact != null && !contact.Obscured)
             {
@@ -54,7 +55,7 @@ namespace GrowCreate.PipelineCRM.Services
         public IEnumerable<Contact> GetAll(bool getLinks = false)
         {
             var query = new Sql().Select("*").From("pipelineContact").Where<Contact>(x => !x.Archived);
-            var contacts = DbService.db().Fetch<Contact>(query);
+            var contacts = ContactDbService.Instance.Fetch(query);
             if (getLinks)
             {
                 for (int i = 0; i < contacts.Count(); i++)
@@ -105,7 +106,7 @@ namespace GrowCreate.PipelineCRM.Services
                 query.OrderBy("Name asc");
             }
 
-            var p = DbService.db().Page<Contact>(pageNumber, itemsPerPage, query);
+            var p = ContactDbService.Instance.Page(pageNumber, itemsPerPage, query);
 
             for (int i = 0; i < p.Items.ToList().Count(); i++)
             {
@@ -133,7 +134,7 @@ namespace GrowCreate.PipelineCRM.Services
         public IEnumerable<Contact> GetByOrganisationId(int OrganisationId, bool getLinks = true)
         {
             var query = new Sql().Select("*").From("pipelineContact").Where<Contact>(x => x.OrganisationIds != "" && x.OrganisationIds.Contains(OrganisationId.ToString()));
-            var contacts = DbService.db().Fetch<Contact>(query);
+            var contacts = ContactDbService.Instance.Fetch(query);
             if (getLinks)
             {
                 for (int i = 0; i < contacts.Count(); i++)
@@ -147,7 +148,7 @@ namespace GrowCreate.PipelineCRM.Services
         public IEnumerable<Contact> GetByTypeId(int TypeId, bool getLinks = true)
         {
             var query = new Sql().Select("*").From("pipelineContact").Where<Contact>(x => x.TypeId == TypeId);
-            var contacts = DbService.db().Fetch<Contact>(query);
+            var contacts = ContactDbService.Instance.Fetch(query);
             if (getLinks)
             {
                 for (int i = 0; i < contacts.Count(); i++)
@@ -160,12 +161,12 @@ namespace GrowCreate.PipelineCRM.Services
 
         public Contact Save(Contact contact)
         {
-            return ContactDbService.Instance.SaveContact(contact);
+            return ContactDbService.Instance.Save(contact);
         }
 
         public int Delete(int ContactId)
         {
-            return DbService.db().Delete<Contact>(ContactId);
+            return ContactDbService.Instance.Delete(ContactId);
         }
 
         public Contact GetLinks(Contact contact)
@@ -199,151 +200,5 @@ namespace GrowCreate.PipelineCRM.Services
 
             return contact;
         }
-
     }
-
-    public static class ContactExtensions
-    {
-        public static IEnumerable<dynamic> GetProperties(this Contact contact)
-        {
-            if (!String.IsNullOrEmpty(contact.CustomProps))
-                return Newtonsoft.Json.Linq.JArray.Parse(contact.CustomProps) as IEnumerable<dynamic>;
-            else
-                return new List<dynamic>();
-        }
-
-        public static dynamic GetProperty(this Contact contact, string alias)
-        {
-            var props = contact.GetProperties();
-            return props.Where(x => x.alias.ToString().ToLower() == alias.ToLower()).FirstOrDefault();
-        }
-
-        public static dynamic GetPropertyValue(this Contact contact, string alias)
-        {
-            var prop = contact.GetProperty(alias);
-            if (prop != null && prop.value != null)
-            {
-                //todo: how about strongly-typed results?
-                return prop.value;
-            }
-            return null;
-        }
-
-        public static Contact UpdateProperties(this Contact contact, Dictionary<string, dynamic> updates)
-        {
-            var props = contact.GetProperties().ToList();
-            foreach (var update in updates)
-            {
-                var prop = props.Where(x => x.alias.ToString().ToLower() == update.Key.ToLower()).FirstOrDefault();
-
-                if (prop == null)
-                {
-                    // get doc type from pipeline config
-                    string alias = update.Key;
-                    var pipelineConfig = PipelineConfig.GetConfig().AppSettings;
-                    var docType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(pipelineConfig.ContactDocTypes);
-
-                    if (docType != null)
-                    {
-                        var type = docType.PropertyTypes.SingleOrDefault(x => x.Alias.ToLower() == alias.ToLower());
-                        if (type != null)
-                        {
-                            var newProp = new
-                            {
-                                alias = alias,
-                                value = update.Value,
-                                id = type.Id
-                            };
-                            props.Add(newProp);
-                        }
-                    }
-                }
-                else
-                {
-                    prop.value = update.Value;
-                }
-            }
-            contact.CustomProps = Newtonsoft.Json.JsonConvert.SerializeObject(props);
-            return contact;
-        }
-
-        public static Contact UpdateArrayProperties(this Contact contact, Dictionary<string, string[]> updates)
-        {
-            var props = contact.GetProperties().ToList();
-            foreach (var update in updates)
-            {
-                var prop = props.Where(x => x.alias.ToString().ToLower() == update.Key.ToLower()).FirstOrDefault();
-                JArray jValue = JArray.FromObject(update.Value);
-
-                if (prop == null)
-                {
-                    // get doc type from pipeline config
-                    string alias = update.Key;
-                    var pipelineConfig = PipelineConfig.GetConfig().AppSettings;
-                    var docType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(pipelineConfig.ContactDocTypes);
-
-                    if (docType != null)
-                    {
-                        var type = docType.PropertyTypes.SingleOrDefault(x => x.Alias.ToLower() == alias.ToLower());
-                        if (type != null)
-                        {
-                            var newProp = new
-                            {
-                                alias = alias,
-                                value = jValue,
-                                id = type.Id
-                            };
-                            props.Add(newProp);
-                        }
-                    }
-                }
-                else
-                {
-                    prop.value = jValue;
-                }
-            }
-            contact.CustomProps = Newtonsoft.Json.JsonConvert.SerializeObject(props);
-            return contact;
-        }
-
-        public static Contact UpdateProperty(this Contact contact, string alias, dynamic value)
-        {
-            var props = contact.GetProperties().ToList();
-            var prop = props.Where(x => x.alias.ToString().ToLower() == alias.ToLower()).FirstOrDefault();
-
-            if (prop == null)
-            {
-                var pipelineConfig = PipelineConfig.GetConfig().AppSettings;
-                var docType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(pipelineConfig.ContactDocTypes);
-                var typeId = docType.PropertyTypes.FirstOrDefault(x => x.Alias.ToLower() == alias.ToLower()).Id;
-
-                var newProp = new
-                {
-                    alias = alias,
-                    value = value,
-                    id = typeId
-                };
-                props.Add(newProp);
-            }
-            else
-            {
-                props.Where(x => x.alias.ToString().ToLower() == alias.ToLower()).FirstOrDefault().value = value;
-            }
-
-            contact.CustomProps = Newtonsoft.Json.JsonConvert.SerializeObject(props);
-            return contact;
-        }
-
-        public static Contact Save(this Contact contact)
-        {
-            return new ContactService().Save(contact);
-        }
-
-        public static void Delete(this Contact contact)
-        {
-            new ContactService().Delete(contact.Id);
-        }
-
-    }
-
 }

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Web;
 using GrowCreate.PipelineCRM.Models;
 using GrowCreate.PipelineCRM.Services;
-using GrowCreate.PipelineCRM.DataServices;
 using GrowCreate.PipelineCRM.Controllers;
+using GrowCreate.PipelineCRM.Services.DataServices;
 
 namespace GrowCreate.PipelineCRM.Helpers
 {
@@ -39,7 +39,7 @@ namespace GrowCreate.PipelineCRM.Helpers
                 pipeline.OrganisationId = int.Parse(contact.OrganisationIds.Split(',')[0]);
             }
 
-            pipeline = PipelineDbService.Instance.SavePipeline(pipeline);
+            pipeline = PipelineDbService.Instance.Save(pipeline);
 
             if (!string.IsNullOrEmpty(comments))
             {
@@ -64,7 +64,7 @@ namespace GrowCreate.PipelineCRM.Helpers
                 {
                     task.PipelineId = PipelineId;
                 }
-                task = TaskDbService.Instance.SaveTask(task);
+                task = TaskDbService.Instance.Save(task);
             }
             return task;
         }
@@ -80,7 +80,7 @@ namespace GrowCreate.PipelineCRM.Helpers
             {
                 task.PipelineId = PipelineId;
             }
-            task = TaskDbService.Instance.SaveTask(task);
+            task = TaskDbService.Instance.Save(task);
 
             return task;
         }
@@ -106,7 +106,7 @@ namespace GrowCreate.PipelineCRM.Helpers
             }
 
 
-            contact = ContactDbService.Instance.SaveContact(contact);
+            contact = ContactDbService.Instance.Save(contact);
             return contact;
         }
 
@@ -124,7 +124,7 @@ namespace GrowCreate.PipelineCRM.Helpers
             org.Telephone = Telephone;
             org.Website = Website;
 
-            return OrganisationDbService.Instance.SaveOrganisation(org);
+            return OrganisationDbService.Instance.Save(org);
         }
 
 

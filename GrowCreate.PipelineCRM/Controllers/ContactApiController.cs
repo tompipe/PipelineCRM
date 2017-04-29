@@ -16,8 +16,11 @@ using System.Dynamic;
 using Umbraco.Core;
 using GrowCreate.PipelineCRM.Services;
 using System.Configuration;
-using GrowCreate.PipelineCRM.DataServices;
 using GrowCreate.PipelineCRM.Config;
+using GrowCreate.PipelineCRM.Services.DataServices;
+using Newtonsoft.Json;
+using Our.Umbraco.NestedContent.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace GrowCreate.PipelineCRM.Controllers
 {
@@ -69,7 +72,8 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Contact> GetUnassigned(bool getLinks = false)
         {
             var query = new Sql().Select("*").From("pipelineContact").Where<Contact>(x => !x.Archived).Where<Contact>(x => x.OrganisationIds == "" || x.OrganisationIds == "0");
-            var contacts = DbService.db().Fetch<Contact>(query);
+            var contacts = ContactDbService.Instance.Fetch(query);
+
             if (getLinks)
             {
                 for (int i = 0; i < contacts.Count(); i++)
@@ -92,7 +96,7 @@ namespace GrowCreate.PipelineCRM.Controllers
             {
                 int[] idList = Ids.Split(',').Select(int.Parse).ToArray();
                 var query = new Sql("select * from pipelineContact where Id in (@idList)", new { idList });
-                return DbService.db().Fetch<Contact>(query);
+                return ContactDbService.Instance.Fetch(query);
             }
             return new List<Contact>();
         }
@@ -110,13 +114,13 @@ namespace GrowCreate.PipelineCRM.Controllers
         public Contact GetByEmail(string email)
         {
             var query = new Sql().Select("*").From("pipelineContact").Where<Contact>(x => x.Email == email);
-            return DbService.db().Fetch<Contact>(query).FirstOrDefault();
+            return ContactDbService.Instance.Fetch(query).FirstOrDefault();
         }
 
         public IEnumerable<Contact> GetContactsByName(string name)
         {
             var query = new Sql().Select("*").From("pipelineContact").Where<Contact>(x => x.Name.ToLower().Contains(name.ToLower()));
-            return DbService.db().Fetch<Contact>(query);
+            return ContactDbService.Instance.Fetch(query);
         }
 
         public IEnumerable<Contact> PostSaveContacts(IEnumerable<Contact> contacts)
@@ -181,7 +185,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Contact> GetArchived()
         {
             var query = new Sql().Select("*").From("pipelineContact").Where<Contact>(x => x.Archived);
-            var contacts = DbService.db().Fetch<Contact>(query);
+            var contacts = ContactDbService.Instance.Fetch(query);
             return contacts;
         }
 
@@ -189,14 +193,14 @@ namespace GrowCreate.PipelineCRM.Controllers
         {
             contact.Archived = true;
             ToggleMember(contact, false);
-            DbService.db().Save(contact);
+            ContactDbService.Instance.Save(contact);
         }
 
         public void Restore(Contact contact)
         {
             contact.Archived = false;
             ToggleMember(contact, true);
-            DbService.db().Save(contact);
+            ContactDbService.Instance.Save(contact);
         }
 
         public void CreateMember(Contact contact, bool approved = true)

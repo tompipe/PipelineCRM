@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using GrowCreate.PipelineCRM.Extensions;
 using Umbraco.Core.Persistence;
 using Umbraco.Web;
 using Umbraco.Web.Editors;
@@ -12,7 +13,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Core.Services;
 using Umbraco.Core;
 using GrowCreate.PipelineCRM.Services;
-using GrowCreate.PipelineCRM.DataServices;
+using GrowCreate.PipelineCRM.Services.DataServices;
 
 namespace GrowCreate.PipelineCRM.Controllers
 {
@@ -68,7 +69,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         
         public IEnumerable<Task> GetAll()
         {
-            return DbService.db().Query<Task>("select * from pipelineTask");
+            return TaskDbService.Instance.Query("select * from pipelineTask");
         }
 
         public IEnumerable<Task> GetMyTasks()
@@ -76,7 +77,7 @@ namespace GrowCreate.PipelineCRM.Controllers
             var userService = ApplicationContext.Current.Services.UserService;
             var userId = userService.GetByUsername(HttpContext.Current.User.Identity.Name).Id;
             var query = new Sql().Select("*").From("pipelineTask").Where<Task>(x => x.UserId == userId).Where<Task>(x => !x.Done).Where<Task>(x => x.DateDue != null);
-            var tasks = DbService.db().Fetch<Task>(query).ToList();
+            var tasks = TaskDbService.Instance.Fetch(query).ToList();
 
             for (int i = 0; i < tasks.Count; i++)
             {
@@ -103,7 +104,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Task> GetByPipeline(int id)
         {
             var query = new Sql().Select("*").From("pipelineTask").Where<Task>(x => x.PipelineId == id).OrderByDescending("DateDue").OrderByDescending("DateCreated");
-            var tasks = DbService.db().Fetch<Task>(query).ToList();
+            var tasks = TaskDbService.Instance.Fetch(query).ToList();
 
             for (int i = 0; i < tasks.Count; i++)
             {
@@ -118,7 +119,7 @@ namespace GrowCreate.PipelineCRM.Controllers
             string currentUserName = HttpContext.Current.User.Identity.Name;
             var userService = ApplicationContext.Current.Services.UserService;
             int UserId = userService.GetByUsername(currentUserName).Id;
-            var tasks = DbService.db().Query<Task>("select top 5 * from pipelineTask where Done = 0 and UserId = @0 order by DateDue desc, DateCreated desc", UserId).ToList();
+            var tasks = TaskDbService.Instance.Query("select top 5 * from pipelineTask where Done = 0 and UserId = @0 order by DateDue desc, DateCreated desc", UserId).ToList();
 
             for (int i = 0; i < tasks.Count; i++)
             {
@@ -132,7 +133,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Task> GetByOrganisation(int id)
         {
             var query = new Sql("select * from pipelineTask where PipelineId in (select Id from pipelinePipeline where OrganisationId = @0 and Archived = 0)", id);
-            var tasks = DbService.db().Fetch<Task>(query);
+            var tasks = TaskDbService.Instance.Fetch(query);
 
             for (int i = 0; i < tasks.Count; i++)
             {
@@ -146,7 +147,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Task> GetByOrganisationId(int id)
         {
             var query = new Sql().Select("*").From("pipelineTask").Where<Task>(x => x.OrganisationId == id).OrderByDescending("DateDue").OrderByDescending("DateCreated");
-            var tasks = DbService.db().Fetch<Task>(query);
+            var tasks = TaskDbService.Instance.Fetch(query);
 
             for (int i = 0; i < tasks.Count; i++)
             {
@@ -160,7 +161,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Task> GetByContactId(int id)
         {
             var query = new Sql().Select("*").From("pipelineTask").Where<Task>(x => x.ContactId == id).OrderByDescending("DateDue").OrderByDescending("DateCreated");
-            var tasks = DbService.db().Fetch<Task>(query);
+            var tasks = TaskDbService.Instance.Fetch(query);
 
             for (int i = 0; i < tasks.Count; i++)
             {
@@ -174,7 +175,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Task> GetBySegmentId(int id)
         {
             var query = new Sql().Select("*").From("pipelineTask").Where<Task>(x => x.SegmentId == id).OrderByDescending("DateDue").OrderByDescending("DateCreated");
-            var tasks = DbService.db().Fetch<Task>(query);
+            var tasks = TaskDbService.Instance.Fetch(query);
 
             for (int i = 0; i < tasks.Count; i++)
             {
@@ -188,7 +189,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public Task GetById(int id)
         {
             var query = new Sql().Select("*").From("pipelineTask").Where<Task>(x => x.Id == id);
-            var task = DbService.db().Fetch<Task>(query).FirstOrDefault();
+            var task = TaskDbService.Instance.Fetch(query).FirstOrDefault();
 
             task = GetTaskUser(task);
 
@@ -223,7 +224,7 @@ namespace GrowCreate.PipelineCRM.Controllers
                 task.DateDue = task.DateDue > DateTime.MinValue ? task.DateDue : DateTime.Now;
             }
 
-            task = TaskDbService.Instance.SaveTask(task); 
+            task = task.Save();
             return GetTaskUser(task);
         }
 
@@ -239,13 +240,13 @@ namespace GrowCreate.PipelineCRM.Controllers
             {
                 task.Done = false;
             }
-            DbService.db().Update(task);                       
+            task = task.Save();                     
             return task;
         }
 
         public int DeleteById(int id)
         {
-            return DbService.db().Delete<Task>(id);
+            return TaskDbService.Instance.Delete(id);
         }
 
         public void DeleteTasks(IEnumerable<Task> tasks)

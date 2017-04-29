@@ -14,7 +14,8 @@ using Umbraco.Web.WebApi;
 using GrowCreate.PipelineCRM.Services;
 using GrowCreate.PipelineCRM.Models;
 using GrowCreate.PipelineCRM.Config;
-using GrowCreate.PipelineCRM.DataServices;
+using GrowCreate.PipelineCRM.Extensions;
+using GrowCreate.PipelineCRM.Services.DataServices;
 
 namespace GrowCreate.PipelineCRM.Controllers
 {
@@ -38,7 +39,7 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Segment> GetAll(bool getLinks = false)
         {
             var query = new Sql().Select("*").From("pipelineSegment").Where<Segment>(x => !x.Archived);
-            return DbService.db().Fetch<Segment>(query).OrderBy(x => x.Name);
+            return SegmentDbService.Instance.Fetch(query).OrderBy(x => x.Name);
         }
 
         public PagedSegments GetPaged(int pageNumber = 0, string sortColumn = "", string sortOrder = "", string searchTerm = "", int typeId = 0)
@@ -49,14 +50,14 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Segment> GetUnassigned(bool getLinks = false)
         {
             var query = new Sql().Select("*").From("pipelineSegment").Where<Segment>(x => !x.Archived && x.TypeId == 0);
-            var segments = DbService.db().Fetch<Segment>(query);
+            var segments = SegmentDbService.Instance.Fetch(query);
             return segments.OrderBy(x => x.Name);
         }               
 
         public Segment GetById(int id, bool getLinks = true)
         {
             var query = new Sql().Select("*").From("pipelineSegment").Where<Segment>(x => x.Id == id);
-            var segment = DbService.db().Fetch<Segment>(query).FirstOrDefault();
+            var segment = SegmentDbService.Instance.Fetch(query).FirstOrDefault();
             if (getLinks && segment != null)
             {
                 segment = GetLinks(segment);
@@ -70,7 +71,7 @@ namespace GrowCreate.PipelineCRM.Controllers
             {
                 int[] idList = Ids.Split(',').Select(int.Parse).ToArray();
                 var query = new Sql("select * from pipelineSegment where Id in (@idList)", new { idList }); //.Select("*").From("pipelineSegment").Where<Segment>(x => Ids.Split(',').Contains(x.Id.ToString()));
-                return DbService.db().Fetch<Segment>(query);
+                return SegmentDbService.Instance.Fetch(query);
             }
             return new List<Segment>();
         }
@@ -78,13 +79,13 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Segment> GetByContactId(int id)
         {
             var query = new Sql().Select("*").From("pipelineSegment").Where<Segment>(x => x.ContactIds.Contains(id.ToString()));
-            return DbService.db().Fetch<Segment>(query);
+            return SegmentDbService.Instance.Fetch(query);
         }
 
         public IEnumerable<Segment> GetByTypeId(int id, bool getLinks = false)
         {
             var query = new Sql().Select("*").From("pipelineSegment").Where<Segment>(x => x.TypeId == id).Where<Segment>(x => !x.Archived);
-            return DbService.db().Fetch<Segment>(query);
+            return SegmentDbService.Instance.Fetch(query);
         }
 
         public IEnumerable<string> GetCriteria()
@@ -108,20 +109,20 @@ namespace GrowCreate.PipelineCRM.Controllers
         public Segment GetByName(string name)
         {
             var query = new Sql().Select("*").From("pipelineSegment").Where<Segment>(x => x.Name.ToLower() == name.ToLower());
-            var org = DbService.db().Fetch<Segment>(query).FirstOrDefault();
+            var org = SegmentDbService.Instance.Fetch(query).FirstOrDefault();
             return org;
         }
 
         public IEnumerable<Segment> GetSegmentsByName(string name)
         {
             var query = new Sql().Select("*").From("pipelineSegment").Where<Segment>(x => x.Name.ToLower().Contains(name.ToLower()));
-            return DbService.db().Fetch<Segment>(query);
+            return SegmentDbService.Instance.Fetch(query);
         }
 
-        public Segment PostSave(Segment org)
+        public Segment PostSave(Segment seg)
         {
-            org = SegmentDbService.Instance.SaveSegment(org);
-            return org;
+            seg.Save();
+            return seg;
         }
 
         public IEnumerable<Segment> PostSaveSegments(IEnumerable<Segment> segments)
@@ -135,11 +136,9 @@ namespace GrowCreate.PipelineCRM.Controllers
 
         public int DeleteById(int id, bool deleteLinks = false)
         {
-            var org = GetById(id, true);
-            if (org != null)
-            {                
-                return DbService.db().Delete<Segment>(id);
-            }
+            var org = GetById(id);
+            org?.Delete();
+
             return 0;
         }
 
@@ -176,20 +175,20 @@ namespace GrowCreate.PipelineCRM.Controllers
         public IEnumerable<Segment> GetArchived()
         {
             var query = new Sql().Select("*").From("pipelineSegment").Where<Segment>(x => x.Archived);
-            var segments = DbService.db().Fetch<Segment>(query);
+            var segments = SegmentDbService.Instance.Fetch(query);
             return segments;
         }
 
         public void Archive(Segment org)
         {
             org.Archived = true;
-            DbService.db().Save(org);
+            SegmentDbService.Instance.Save(org);
         }
 
         public void Restore(Segment org)
         {
             org.Archived = false;
-            DbService.db().Save(org);
+            SegmentDbService.Instance.Save(org);
         }
 
     }
