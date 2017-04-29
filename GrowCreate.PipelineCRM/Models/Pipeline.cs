@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using GrowCreate.PipelineCRM.Extensions;
+
+using Newtonsoft.Json;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Models.Membership;
@@ -10,8 +14,9 @@ namespace GrowCreate.PipelineCRM.Models
 {
     [TableName("pipelinePipeline")]
     [PrimaryKey("Id", autoIncrement = true)]
-    public class Pipeline
+    public class Pipeline : ExtendableEntityBase, IPipelineEntity, IHasDateFields
     {
+
         [PrimaryKeyColumn(AutoIncrement = true)]
         public int Id { get; set; }
 
@@ -76,7 +81,7 @@ namespace GrowCreate.PipelineCRM.Models
         public string UserName { get; set; }
 
         [Ignore]
-        public bool Obscured { get; set; } 
+        public bool Obscured { get; set; }
         
     }
 

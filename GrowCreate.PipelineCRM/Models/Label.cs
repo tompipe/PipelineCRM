@@ -9,7 +9,7 @@ namespace GrowCreate.PipelineCRM.Models
 {
     [TableName("pipelineLabel")]
     [PrimaryKey("Id", autoIncrement = true)]
-    public class Label
+    public class Label : IPipelineEntity
     {
         [PrimaryKeyColumn(AutoIncrement = true)]
         public int Id { get; set; }

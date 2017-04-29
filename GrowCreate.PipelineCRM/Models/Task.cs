@@ -10,7 +10,7 @@ namespace GrowCreate.PipelineCRM.Models
 {
     [TableName("pipelineTask")]
     [PrimaryKey("Id", autoIncrement = true)]
-    public class Task
+    public class Task : IPipelineEntity, IHasDateFields
     {
         [PrimaryKeyColumn(AutoIncrement = true)]
         public int Id { get; set; }

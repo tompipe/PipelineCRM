@@ -9,7 +9,7 @@ namespace GrowCreate.PipelineCRM.Models
 {
     [TableName("pipelineOrganisationType")]
     [PrimaryKey("Id", autoIncrement = true)]
-    public class OrgType
+    public class OrgType : IPipelineEntity
     {
         [PrimaryKeyColumn(AutoIncrement = true)]
         public int Id { get; set; }

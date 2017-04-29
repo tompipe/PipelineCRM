@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using GrowCreate.PipelineCRM.Extensions;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using GrowCreate.PipelineCRM.Models;
 
+
 namespace GrowCreate.PipelineCRM.Models
 {
     [TableName("pipelineSegment")]
     [PrimaryKey("Id", autoIncrement = true)]
-    public class Segment
+    public class Segment : ExtendableEntityBase, IPipelineEntity
     {
         [PrimaryKeyColumn(AutoIncrement = true)]
         public int Id { get; set; }

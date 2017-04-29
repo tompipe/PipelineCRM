@@ -9,7 +9,7 @@ namespace GrowCreate.PipelineCRM.Models
 {
     [TableName("pipelineSegmentType")]
     [PrimaryKey("Id", autoIncrement = true)]
-    public class SegmentType
+    public class SegmentType : IPipelineEntity
     {
         [PrimaryKeyColumn(AutoIncrement = true)]
         public int Id { get; set; }

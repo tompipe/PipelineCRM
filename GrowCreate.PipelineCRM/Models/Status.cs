@@ -9,7 +9,7 @@ namespace GrowCreate.PipelineCRM.Models
 {
     [TableName("pipelineStatus")]
     [PrimaryKey("Id", autoIncrement = true)]
-    public class Status
+    public class Status : IPipelineEntity
     {
         [PrimaryKeyColumn(AutoIncrement = true)]
         public int Id { get; set; }
