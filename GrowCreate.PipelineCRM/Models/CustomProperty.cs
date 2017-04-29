@@ -23,6 +23,7 @@ namespace GrowCreate.PipelineCRM.Models
         public string view { get; set; }
         public string value { get; set; }
         public dynamic config { get; set; }
+        public string editor { get; set; }
     }
 
     public class CustomPropertyConfig
