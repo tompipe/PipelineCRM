@@ -19,6 +19,7 @@ using GrowCreate.PipelineCRM.Config;
 using GrowCreate.PipelineCRM.Services;
 using GrowCreate.PipelineCRM.CustomAreas;
 using GrowCreate.PipelineCRM.Extensions;
+using GrowCreate.PipelineCRM.Resolvers;
 
 namespace GrowCreate.PipelineCRM.Trees
 {
@@ -38,15 +39,7 @@ namespace GrowCreate.PipelineCRM.Trees
 
         public static List<ICustomArea> GetCustomAreas()
         {
-            var iType = typeof(ICustomArea);
-            var types = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetLoadableTypes())
-                .Where(p => iType.IsAssignableFrom(p) && p.IsClass)
-                .Select(x => Activator.CreateInstance(x) as ICustomArea)
-                .OrderBy(x => x.Name);
-
-            return types.OrderBy(x => x.SortOrder).ToList();
-
+            return CustomAreaResolver.Current.CustomAreas.OrderBy(x => x.SortOrder).ToList();
         }
 
         private string GetTranslation(string key)

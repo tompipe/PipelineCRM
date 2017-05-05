@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using GrowCreate.PipelineCRM.Resolvers;
 
 namespace GrowCreate.PipelineCRM.Services
 {
@@ -12,15 +13,7 @@ namespace GrowCreate.PipelineCRM.Services
     {
         public static List<ISegmentCriteria> GetSegmentCriteria()
         {
-            var iType = typeof(ISegmentCriteria);
-            var types = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetLoadableTypes())
-                .Where(p => iType.IsAssignableFrom(p) && p.IsClass)
-                .Select(x => Activator.CreateInstance(x) as ISegmentCriteria)
-                .OrderBy(x => x.Name);
-
-            return types.ToList();
-
+            return SegmentCriteriaResolver.Current.SegmentCriteria.OrderBy(x => x.Name).ToList();
         }
     }
     public static class SegmentCriteriaExtensions

@@ -12,11 +12,20 @@ using GrowCreate.PipelineCRM.Controllers;
 using System;
 using System.IO;
 using System.Web.Configuration;
+using GrowCreate.PipelineCRM.Resolvers;
 
 namespace GrowCreate.PipelineCRM
 {
     public class RegisterEvents : ApplicationEventHandler
     {
+        protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            base.ApplicationStarting(umbracoApplication, applicationContext);
+
+            CustomAreaResolver.Configure();
+            SegmentCriteriaResolver.Configure();
+        }
+
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             var db = applicationContext.DatabaseContext.Database;
