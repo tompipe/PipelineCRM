@@ -344,6 +344,8 @@
     <Compile Include="Extensions\PreValueCollectionExtensions.cs" />
     <Compile Include="Models\DetachedPublishedContent\DetatchedPublishedContent.cs" />
     <Compile Include="Extensions\ContactExtensions.cs" />
+    <Compile Include="Resolvers\CustomAreaResolver.cs" />
+    <Compile Include="Resolvers\SegmentCriteriaResolver.cs" />
     <Compile Include="Services\DataServices\ContactDbService.cs" />
     <Compile Include="Services\DataServices\DbServiceBase.cs" />
     <Compile Include="Services\DataServices\OrganisationDbService.cs" />
