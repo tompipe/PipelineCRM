@@ -28,7 +28,7 @@
                     <th style="width:25px" ng-if="statusId"><input type="checkbox" ng-model="isSelectedAll" ng-click="selectAll()" /></th>
                     <th ng-click="order('Name')"><i class="icon" ng-class="!reverse ? 'icon-navigation-down' : 'icon-navigation-up'" ng-show="predicate == 'Name'"></i><localize key="name"></localize></th>
                     <th><localize key="pipeline_contact"></localize></th>
-                    <th><localize key="pipeline_organisation"></localize></th>
+                    <!--<th><localize key="pipeline_organisation"></localize></th>-->
                     <th ng-click="order('Value')"><i class="icon" ng-class="!reverse ? 'icon-navigation-down' : 'icon-navigation-up'" ng-show="predicate == 'Value'"></i><localize key="pipeline_value"></localize></th>
                     <th ng-click="order('Probability')"><i class="icon" ng-class="!reverse ? 'icon-navigation-down' : 'icon-navigation-up'" ng-show="predicate == 'Probability'"></i><localize key="pipeline_probability"></localize></th>
                     <th><localize key="pipeline_adjustedValue"></localize></th>
@@ -43,7 +43,7 @@
                     </td>
                     <td><a href="#/pipelineCrm/pipelineCrmTree/edit/{{ pipeline.Id }}">{{ pipeline.Name }}</a></td>
                     <td><a ng-if="pipeline.ContactId" href="#/pipelineCrm/pipelineCrmTree/contact.edit/{{ pipeline.ContactId }}">{{ pipeline.Contact.Name }}</a>&nbsp;</td>
-                    <td><a ng-if="pipeline.OrganisationId" href="#/pipelineCrm/pipelineCrmTree/organisation.edit/{{ pipeline.OrganisationId }}">{{ pipeline.Organisation.Name }}</a>&nbsp;</td>
+                    <!--<td><a ng-if="pipeline.OrganisationId" href="#/pipelineCrm/pipelineCrmTree/organisation.edit/{{ pipeline.OrganisationId }}">{{ pipeline.Organisation.Name }}</a>&nbsp;</td>-->
                     <td>{{ pipeline.Value | currency }}</td>
                     <td>{{ pipeline.Probability }}%</td>
                     <td>{{ pipeline | adjustedValue | currency }}</td>
@@ -56,7 +56,7 @@
             </tbody>
             <tfoot ng-show="totalPages > 1">
                 <tr>
-                    <th colspan="8">
+                    <th colspan="7">
                         <div class="pagination pagination-right">
                             <ul>
                                 <li ng-class="{disabled: currentPage == 1}">

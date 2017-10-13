@@ -28,7 +28,7 @@
                     <th style="width:25px"><input type="checkbox" ng-model="isSelectedAll" ng-click="selectAll()" /></th>
                     <th ng-click="order('Name')"><i class="icon" ng-class="!reverse ? 'icon-navigation-down' : 'icon-navigation-up'" ng-show="!predicate || predicate == 'Name'"></i><localize key="name"></localize></th>
                     <th ng-click="order('Title')"><i class="icon" ng-class="!reverse ? 'icon-navigation-down' : 'icon-navigation-up'" ng-show="predicate == 'Title'"></i><localize key="pipeline_title"></localize></th>
-                    <th ng-click="order('OrganisationNames')"><i class="icon" ng-class="!reverse ? 'icon-navigation-down' : 'icon-navigation-up'" ng-show="predicate == 'OrganisationNames'"></i><localize key="pipeline_organisation"></localize></th>
+                    <!--<th ng-click="order('OrganisationNames')"><i class="icon" ng-class="!reverse ? 'icon-navigation-down' : 'icon-navigation-up'" ng-show="predicate == 'OrganisationNames'"></i><localize key="pipeline_organisation"></localize></th>-->
                     <th ng-click="order('Email')"><i class="icon" ng-class="!reverse ? 'icon-navigation-down' : 'icon-navigation-up'" ng-show="predicate == 'Email'"></i><localize key="email"></localize></th>
                     <th ng-click="order('DateUpdated')"><i class="icon" ng-class="!reverse ? 'icon-navigation-down' : 'icon-navigation-up'" ng-show="predicate == 'DateUpdated'"></i><localize key="content_updateDate"></localize></th>
                 </tr>
@@ -41,7 +41,7 @@
                     </td>
                     <td><a href="#/pipelineCrm/pipelineCrmTree/edit.contact/{{ contact.Id }}">{{ contact.Name }}</a></td>
                     <td>{{ contact.Title }}</td>
-                    <td>{{ contact.OrganisationNames.join(', ') }}</td>
+                    <!--<td>{{ contact.OrganisationNames.join(', ') }}</td>-->
                     <td>{{ contact.Email }}</td>
                     <td>{{ contact.DateUpdated | date : 'dd/MM/yyyy' }}</td>
                 </tr>
