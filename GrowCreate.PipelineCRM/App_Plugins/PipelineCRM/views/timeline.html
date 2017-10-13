@@ -35,7 +35,7 @@
                         <input type="checkbox" ng-click="toggleTask(task)" ng-checked="task.Done" />
                         <span ng-style="task.Done && {'text-decoration': 'line-through'}">
                             <span class="label label-inverse">{{ task.Type }}</span>
-                            <span class="note">{{ task.Description }}</span>
+                            <span class="note" ng-bind-html="task.Description"></span>
                         </span>
                         <br />
                         <small ng-if="task.Media.length > 0" class="files">
@@ -53,13 +53,13 @@
                             <span ng-if="task.Done">completed {{ task.DateComplete | date:'dd/MM/yyyy' }}</span>
                             <span class="badge badge-warning" ng-show="!task.Done && task.Overdue > 0">{{ task.Overdue }} <localize key="pipeline_daysOverdue">days overdue</localize></span>
                         </small>
-                    </p>
+                    </p> 
                 </div>
                 <div ng-class="{'span11':!summary}" class="touchpoint" ng-if="!task.DateDue || task.DateDue == '0001-01-01T00:00:00'">
                     <img src="//www.gravatar.com/avatar/{{ task.UserAvatar }}?s=40" alt="{{ task.Member.Name || task.UserName }}" class="avatar">
                     <p>
                         <span class="label label-inverse">{{ task.Type }}</span>
-                        <span class="note">{{ task.Description }}</span>
+                        <span class="note" ng-bind-html="task.Description"></span>
                         <small ng-if="task.Media.length > 0" class="files">
                             <span ng-repeat="file in task.Media"><a href="{{ file.Url }}" target="_blank"><i class="icon-umb-content"></i>{{ file.Name }}</a><br /></span>
                         </small>
