@@ -25,7 +25,12 @@ namespace GrowCreate.PipelineCRM.Controllers
         {
             var query = new Sql().Select("*").From("pipelineContactType").Where<ContactType>(x => x.Id == id);
             return DbService.db().Fetch<ContactType>(query).FirstOrDefault();
+        }
 
+        public ContactType GetByName(string name)
+        {
+            var query = new Sql().Select("*").From("pipelineContactType").Where<ContactType>(x => x.Name == name);
+            return DbService.db().Fetch<ContactType>(query).FirstOrDefault();
         }
 
         public ContactType PostSave(ContactType contactType)

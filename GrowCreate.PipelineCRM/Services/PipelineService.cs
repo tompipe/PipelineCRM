@@ -101,7 +101,7 @@ namespace GrowCreate.PipelineCRM.Services
 
         // deprecate further down... 
 
-        public Pipeline CreateNew(string name, string organisation, string email, string telephone, string subject, string comment, int nodeId = 0, double value = 0, int probability = 50, int statusId = 0, Dictionary<string, dynamic> customProps = null)
+        public Pipeline CreateNew(string name, string organisation, string email, string telephone, string subject, string comment, int nodeId = 0, double value = 0, int probability = 50, int statusId = 0)
         {
             var newPipeline = new Pipeline();
 
@@ -171,10 +171,14 @@ namespace GrowCreate.PipelineCRM.Services
                 Probability = probability, // todo: read from node
             });
 
+            // TODO: check this - there appeared to be no calls which passed custom properties in
+            /*
             if (customProps != null)
             {
-                newPipeline.UpdateProperties(customProps);
+                
+                //newPipeline.UpdateProperties(customProps);
             }
+            */
 
 
             if (!String.IsNullOrEmpty(comment))
@@ -219,11 +223,11 @@ namespace GrowCreate.PipelineCRM.Services
             var contactApi = new ContactApiController();
             var contact  = contactApi.GetByEmail(email);
 
-            // Track this contact for personalised content   
-            HttpCookie cookie = new HttpCookie("PipelineContactId");
-            cookie.Value = contact.Id.ToString();
-            cookie.Expires = DateTime.MaxValue;
-            HttpContext.Current.Response.SetCookie(cookie);
+            //// Track this contact for personalised content   
+            //HttpCookie cookie = new HttpCookie("PipelineContactId");
+            //cookie.Value = contact.Id.ToString();
+            //cookie.Expires = DateTime.MaxValue;
+            //HttpContext.Current.Response.SetCookie(cookie);
 
             return contact;
         }

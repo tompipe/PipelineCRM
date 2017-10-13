@@ -30,9 +30,9 @@ namespace GrowCreate.PipelineCRM.Models.DetachedPublishedContent
         {
             _rawValue = value;
 
-            _sourceValue = new Lazy<object>(() => _propertyType.ConvertDataToSource(_rawValue, _isPreview));
-            _objectValue = new Lazy<object>(() => _propertyType.ConvertSourceToObject(_sourceValue.Value, _isPreview));
-            _xpathValue = new Lazy<object>(() => _propertyType.ConvertSourceToXPath(_sourceValue.Value, _isPreview));
+            _sourceValue = new Lazy<object>(() => _rawValue != null ? _propertyType.ConvertDataToSource(_rawValue, _isPreview) : null);
+            _objectValue = new Lazy<object>(() => _rawValue != null ? _propertyType.ConvertSourceToObject(_sourceValue.Value, _isPreview) : null);
+            _xpathValue = new Lazy<object>(() => _rawValue != null ? _propertyType.ConvertSourceToXPath(_sourceValue.Value, _isPreview) : null);
         }
 
         public string PropertyTypeAlias

@@ -45,16 +45,16 @@ namespace GrowCreate.PipelineCRM.Controllers
             switch (type)
             {
                 case "contact":
-                    contentType = ConfigurationExtensions.GetMappedContentType<Contact>();
+                    contentType = ExtendableEntityExtensions.GetMappedContentType(typeof(Contact));
                     break;
                 case "organisation":
-                    contentType = ConfigurationExtensions.GetMappedContentType<Organisation>();
+                    contentType = ExtendableEntityExtensions.GetMappedContentType(typeof(Organisation));
                     break;
                 case "segment":
-                    contentType = ConfigurationExtensions.GetMappedContentType<Segment>();
+                    contentType = ExtendableEntityExtensions.GetMappedContentType(typeof(Segment));
                     break;
                 default:
-                    contentType = ConfigurationExtensions.GetMappedContentType<Pipeline>();
+                    contentType = ExtendableEntityExtensions.GetMappedContentType(typeof(Pipeline));
                     break;
             }
 

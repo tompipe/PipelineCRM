@@ -12,7 +12,7 @@ namespace GrowCreate.PipelineCRM.Models.DetachedPublishedContent
     {
         private readonly string _name;
         private readonly PublishedContentType _contentType;
-        private readonly IEnumerable<IPublishedProperty> _properties;
+        private readonly ICollection<IPublishedProperty> _properties;
         private readonly int _sortOrder;
         private readonly bool _isPreviewing;
         private readonly IPublishedContent _containerNode;
@@ -26,7 +26,7 @@ namespace GrowCreate.PipelineCRM.Models.DetachedPublishedContent
         {
             _name = name;
             _contentType = contentType;
-            _properties = properties;
+            _properties = properties.ToArray();
             _sortOrder = sortOrder;
             _isPreviewing = isPreviewing;
             _containerNode = containerNode;
@@ -69,7 +69,7 @@ namespace GrowCreate.PipelineCRM.Models.DetachedPublishedContent
 
         public override ICollection<IPublishedProperty> Properties
         {
-            get { return _properties.ToArray(); }
+            get { return _properties; }
         }
 
         public override IPublishedProperty GetProperty(string alias)

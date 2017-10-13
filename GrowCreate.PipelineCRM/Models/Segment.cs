@@ -15,9 +15,6 @@ namespace GrowCreate.PipelineCRM.Models
     [PrimaryKey("Id", autoIncrement = true)]
     public class Segment : ExtendableEntityBase, IPipelineEntity
     {
-        [PrimaryKeyColumn(AutoIncrement = true)]
-        public int Id { get; set; }
-
         public string Name { get; set; }
         public string Criteria { get; set; }
 
@@ -38,9 +35,6 @@ namespace GrowCreate.PipelineCRM.Models
 
         [NullSetting(NullSetting = NullSettings.Null)]
         public bool Archived { get; set; }
-
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string CustomProps { get; set; }
 
         [NullSetting(NullSetting = NullSettings.Null)]
         public string CriteriaProps { get; set; }

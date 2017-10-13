@@ -34,7 +34,7 @@ namespace GrowCreate.PipelineCRM.Services.DataServices
 
         private void UpdateProperties(ExtendableEntityBase hasCustomProperties)
         {
-            hasCustomProperties?.Save();
+            hasCustomProperties?.SaveCustomProperties();
         }
 
         private void UpdateDates(IHasDateFields entity)

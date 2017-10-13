@@ -42,9 +42,6 @@ namespace GrowCreate.PipelineCRM.Models
         public string OrganisationIds { get; set; }
 
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string CustomProps { get; set; }
-
-        [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime DateCreated { get; set; }
 
         [NullSetting(NullSetting = NullSettings.Null)]

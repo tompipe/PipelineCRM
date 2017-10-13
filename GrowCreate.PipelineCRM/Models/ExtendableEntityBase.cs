@@ -13,19 +13,20 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace GrowCreate.PipelineCRM.Models
 {
-    public abstract class ExtendableEntityBase
+    public abstract class ExtendableEntityBase : IPipelineEntity
     {
-        [NullSetting(NullSetting = NullSettings.Null)]
         public string CustomProps
         {
             get; set;
         }
 
-        [Ignore]
         [JsonIgnore]
+        [Ignore]
         public IPublishedContent CustomProperties
         {
             get; set;
         }
+
+        public int Id { get; set; }
     }
 }
