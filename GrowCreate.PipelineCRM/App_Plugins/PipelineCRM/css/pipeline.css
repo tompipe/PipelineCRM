@@ -102,7 +102,7 @@
 /* Kanban board */
 
 .pipeline-board {
-    width: 2000px; height: 100%;
+    width: 5000px; height: 100%;
 }
 .pipeline-board h5{
     margin: 10px 0;
