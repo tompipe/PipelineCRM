@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 using GrowCreate.PipelineCRM.Config;
-﻿using GrowCreate.PipelineCRM.Config;
 using GrowCreate.PipelineCRM.Controllers;
 using GrowCreate.PipelineCRM.Models;
 using GrowCreate.PipelineCRM.Services;
@@ -133,7 +132,7 @@ namespace GrowCreate.PipelineCRM.Services
 
         public IEnumerable<Contact> GetByOrganisationId(int OrganisationId, bool getLinks = true)
         {
-            var query = new Sql().Select("*").From("pipelineContact").Where<Contact>(x => x.OrganisationIds != "" && x.OrganisationIds.Contains(OrganisationId.ToString()));
+            var query = new Sql().Select("*").From("pipelineContact").Where<Contact>(x => x.OrganisationIds != "" && (x.OrganisationIds.Contains("," + OrganisationId.ToString() + ",") || x.OrganisationIds == OrganisationId.ToString()));
             var contacts = ContactDbService.Instance.Fetch(query);
             if (getLinks)
             {

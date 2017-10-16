@@ -16,6 +16,7 @@ namespace GrowCreate.PipelineCRM.Models
     public class Segment : ExtendableEntityBase, IPipelineEntity
     {
         public string Name { get; set; }
+        public int Priority { get; set; }
         public string Criteria { get; set; }
 
         [NullSetting(NullSetting = NullSettings.Null)]
